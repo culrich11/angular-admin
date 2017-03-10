@@ -2,7 +2,7 @@ angular.module('orderCloud')
     .controller('AdminUserGroupsCtrl', AdminUserGroupsController)
 ;
 
-function AdminUserGroupsController($q, $filter, $state, $uibModal, toastr, ocConfirm, OrderCloud, ocAdminUserGroups, ocParameters, AdminUserGroupList, Parameters){
+function AdminUserGroupsController($state, toastr, OrderCloud, ocAdminUserGroups, ocParameters, AdminUserGroupList, Parameters){
     var vm = this;
     vm.list = AdminUserGroupList;
     vm.parameters = Parameters;
@@ -65,7 +65,7 @@ function AdminUserGroupsController($q, $filter, $state, $uibModal, toastr, ocCon
     vm.createGroup = function() {
         ocAdminUserGroups.Create()
             .then(function(newUserGroup) {
-                toastr.success(newUserGroup.Name + ' was created.', 'Success!');
+                toastr.success(newUserGroup.Name + ' was created.');
                 $state.go('adminUserGroup', {adminusergroupid:newUserGroup.ID});
             });
     };
@@ -76,7 +76,7 @@ function AdminUserGroupsController($q, $filter, $state, $uibModal, toastr, ocCon
                 vm.list.Items.splice(scope.$index, 1);
                 vm.list.Meta.TotalCount--;
                 vm.list.Meta.ItemRange[1]--;
-                toastr.success(scope.adminUserGroup.Name + ' was deleted.', 'Success!')
+                toastr.success(scope.adminUserGroup.Name + ' was deleted.');
             })
     }
 }

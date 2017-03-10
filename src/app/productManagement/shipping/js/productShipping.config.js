@@ -9,10 +9,8 @@ function ProductShippingConfig($stateProvider) {
             templateUrl: 'productManagement/shipping/templates/productShipping.html',
             controller: 'ProductShippingCtrl',
             controllerAs: 'productShipping',
-            resolve: {
-                AdminAddresses: function(OrderCloud) {
-                    return OrderCloud.AdminAddresses.List();
-                }
+            data: {
+                pageTitle: 'Product Shipping'
             }
         })
     ;

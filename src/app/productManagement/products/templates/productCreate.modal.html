@@ -1,13 +1,13 @@
 <form name="productCreateModal.form" autocomplete="off" ng-submit="productCreateModal.submit()" novalidate class="form-horizontal" cg-busy="productCreateModal.loading">
     <div class="modal-header">
         <button type="button" class="close" aria-label="Close" ng-click="productCreateModal.cancel()"><span aria-hidden="true">&times;</span></button>
-        <h3 class="modal-title">Create New Product</h3>
+        <h4 class="modal-title">Create New Product</h4>
     </div>
     <div class="modal-body">
         <fieldset class="form-group">
             <label for="ProductID" class="col-sm-3 control-label">Product ID</label>
             <div class="col-sm-9">
-                <input id="ProductID" pattern="([A-Za-z0-9\-\_]+)" placeholder="(Optional)" pattern-err-type="ID_Name" type="text" class="form-control" ng-model="productCreateModal.product.ID" required>
+                <input id="ProductID" pattern="([A-Za-z0-9\-\_]+)" placeholder="(Optional)" pattern-err-type="ID_Name" type="text" class="form-control" ng-model="productCreateModal.product.ID">
             </div>
         </fieldset>
         <fieldset class="form-group">

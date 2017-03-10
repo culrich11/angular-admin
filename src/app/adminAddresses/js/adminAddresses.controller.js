@@ -19,7 +19,7 @@ function AdminAddressesController($state, toastr, OrderCloud, ocAdminAddresses, 
     //Reload the state with new search parameter & reset the page
     vm.search = function() {
         $state.go('.', ocParameters.Create(vm.parameters, true), {notify:false}); //don't trigger $stateChangeStart/Success, this is just so the URL will update with the search
-        vm.searchLoading = OrderCloud.AdminAddresses.List(vm.parameters.search, 1, vm.parameters.pageSize)
+        vm.searchLoading = OrderCloud.AdminAddresses.List(vm.parameters.search, 1, vm.parameters.pageSize, vm.parameters.searchOn, vm.parameters.sortBy, vm.parameters.filters)
             .then(function(data) {
                 vm.list = data;
                 vm.searchResults = vm.parameters.search.length > 0;
@@ -68,7 +68,7 @@ function AdminAddressesController($state, toastr, OrderCloud, ocAdminAddresses, 
                 vm.list.Items.push(newAddress);
                 vm.list.Meta.TotalCount++;
                 vm.list.Meta.ItemRange[1]++;
-                toastr.success(newAddress.AddressName + ' was created.', 'Success!');
+                toastr.success(newAddress.AddressName + ' was created.');
             });
     };
 
@@ -76,7 +76,7 @@ function AdminAddressesController($state, toastr, OrderCloud, ocAdminAddresses, 
         ocAdminAddresses.Edit(scope.adminAddress)
             .then(function(updatedAddress) {
                 vm.list.Items[scope.$index] = updatedAddress;
-                toastr.success(updatedAddress.AddressName + ' was updated.', 'Success!');
+                toastr.success(updatedAddress.AddressName + ' was updated.');
             });
     };
 
@@ -86,7 +86,7 @@ function AdminAddressesController($state, toastr, OrderCloud, ocAdminAddresses, 
                 vm.list.Items.splice(scope.$index, 1);
                 vm.list.Meta.TotalCount--;
                 vm.list.Meta.ItemRange[1]--;
-                toastr.success(scope.adminAddress.AddressName + ' was deleted.', 'Success!');
+                toastr.success(scope.adminAddress.AddressName + ' was deleted.');
             })
     }
 }

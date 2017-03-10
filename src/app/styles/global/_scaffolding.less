@@ -1,12 +1,20 @@
 html {
   width:100vw;
   height:100vh;
+  overflow:hidden;
 }
+
 body {
-  padding-top:@navbar-height + @grid-gutter-width/2;
-  padding-bottom:50px;
+  height:100%;
+  overflow-x:hidden;
+  overflow-y:auto;
+  padding-top:@body-padding-top;
   @media(min-width:@screen-md-min) {
     padding-left:@navmenu-width;
-    padding-top:@grid-gutter-width/2;
+    padding-top:@body-padding-top - @navbar-height;
   }
+}
+
+main {
+  padding-bottom:50px;
 }

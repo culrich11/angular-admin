@@ -2,12 +2,17 @@ angular.module('orderCloud')
     .factory('ocProductSpecs', ocProductsSpecsService)
 ;
 
-function ocProductsSpecsService($q, $uibModal, OrderCloud) {
+function ocProductsSpecsService($q, $uibModal, OrderCloud, ocConfirm) {
     var service = {
         ProductSpecsDetail: _productSpecsDetail,
         UpdateSpecListOrder: _updateSpecListOrder,
         UpdateSpecOptionsListOrder: _updateSpecOptionsListOrder,
-        EditSpec: _editSpec
+        CreateSpec: _createSpec,
+        EditSpec: _editSpec,
+        DeleteSpec: _deleteSpec,
+        CreateSpecOption: _createSpecOption,
+        EditSpecOption: _editSpecOption,
+        DeleteSpecOption: _deleteSpecOption
     };
 
     function _productSpecsDetail(productid) {
@@ -115,6 +120,20 @@ function ocProductsSpecsService($q, $uibModal, OrderCloud) {
         return deferred.promise;
     }
 
+    function _createSpec(productID) {
+        return $uibModal.open({
+            templateUrl: 'productManagement/specs/templates/productSpecCreate.modal.html',
+            size: 'md',
+            controller: 'ProductSpecCreateCtrl',
+            controllerAs: 'productSpecCreate',
+            resolve: {
+                ProductID: function() {
+                    return productID;
+                }
+            }
+        }).result;
+    }
+
     function _editSpec(spec) {
         return $uibModal.open({
             templateUrl: 'productManagement/specs/templates/productSpecEdit.modal.html',
@@ -126,6 +145,63 @@ function ocProductsSpecsService($q, $uibModal, OrderCloud) {
                 }
             }
         }).result
+    }
+
+    function _deleteSpec(specID) {
+        return ocConfirm.Confirm({
+                message:'Are you sure you want to delete <br> <b>' + specID + '</b>?',
+                confirmText: 'Delete spec',
+                type: 'delete'})
+            .then(function() {
+                return OrderCloud.Specs.Delete(specID);
+            });
+    }
+
+    function _createSpecOption(selectedSpec) {
+        return $uibModal.open({
+            templateUrl: 'productManagement/specs/templates/productSpecOptionCreate.modal.html',
+            size: 'md',
+            controller: 'ProductSpecOptionCreateCtrl',
+            controllerAs: 'productSpecOptionCreate',
+            resolve: {
+                ProductID: function() {
+                    return selectedSpec.ProductID;
+                },
+                SpecID: function() {
+                    return selectedSpec.Spec.ID;
+                }
+            }
+        }).result;
+    }
+
+    function _editSpecOption(selectedSpec, node) {
+        return $uibModal.open({
+            templateUrl: 'productManagement/specs/templates/productSpecOptionEdit.modal.html',
+            size: 'md',
+            controller: 'ProductSpecOptionEditCtrl',
+            controllerAs: 'productSpecOptionEdit',
+            resolve: {
+                ProductID: function() {
+                    return selectedSpec.ProductID;
+                },
+                SpecID: function() {
+                    return selectedSpec.Spec.ID;
+                },
+                SpecOption: function() {
+                    return node;
+                }
+            }
+        }).result;
+    }
+
+    function _deleteSpecOption(specID, specOptionID) {
+        return ocConfirm.Confirm({
+                message:'Are you sure you want to delete <br> <b>' + specOptionID + '</b>?',
+                confirmText: 'Delete spec option',
+                type: 'delete'})
+            .then(function() {
+                return OrderCloud.Specs.DeleteOption(specID, specOptionID);
+            });
     }
 
     return service;

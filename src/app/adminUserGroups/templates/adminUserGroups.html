@@ -1,30 +1,33 @@
 <article>
     <header class="l-page-header">
         <h3 class="l-page-header__title">Admin User Groups</h3>
-        <div class="l-page-header__btns">
+        <div class="l-page-header__btns" oc-if-roles="AdminUserGroupAdmin">
             <button type="button" class="btn btn-primary btn-block" ng-click="adminUserGroups.createGroup()"><i class="fa fa-plus-circle"></i> New Admin User Group</button>
         </div>
     </header>
 
     <!--====== SEARCH/FILTERS ======-->
-    <form name="adminUserGroups.searchForm" pretty-submit>
-        <fieldset class="form-group">
-            <div class="input-group">
-                <span class="input-group-addon">
-                    <i class="fa fa-search"></i>
-                </span>
-                <input type="search" ng-change="adminUserGroups.search()" ng-model-options="{debounce:1000}" placeholder="Search admin user groups..." ng-model="adminUserGroups.parameters.search" class="form-control">
-                <span ng-if="adminUserGroups.searchResults" class="input-group-btn">
-                    <button class="btn btn-default" type="button" aria-label="Clear Search" ng-click="adminUserGroups.clearSearch()"><i class="fa fa-times"></i> <span class="hidden-xs">Clear Search</span></button>
-                </span>
-            </div>
-        </fieldset>
-    </form>
+    <div ng-if="adminUserGroups.list.Items.length || (!adminUserGroups.list.Items.length && adminUserGroups.searchResults)">
+        <form name="adminUserGroups.searchForm" pretty-submit>
+            <fieldset class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="fa fa-search"></i>
+                    </span>
+                    <input type="search" ng-change="adminUserGroups.search()" ng-model-options="{debounce:1000}" placeholder="Search admin user groups..." ng-model="adminUserGroups.parameters.search" class="form-control">
+                    <span ng-if="adminUserGroups.searchResults" class="input-group-btn">
+                        <button class="btn btn-default" type="button" aria-label="Clear Search" ng-click="adminUserGroups.clearSearch()"><i class="fa fa-times"></i> <span class="hidden-xs">Clear Search</span></button>
+                    </span>
+                </div>
+            </fieldset>
+        </form>
+    </div>
 
     <!--====== LIST ======-->
     <div cg-busy="adminUserGroups.searchLoading">
         <div class="no-matches" ng-if="!adminUserGroups.list.Items.length">
-            <b>No matches found.</b>
+            <b ng-if="adminUserGroups.searchResults">No matches found.</b>
+            <b ng-if="!adminUserGroups.searchResults">This seller organization does not have any admin user groups.</b>
         </div>
         <div ng-if="adminUserGroups.list.Items.length">
             <div class="row">
@@ -39,8 +42,7 @@
                         <col>
                         <col>
                         <col>
-                        <col>
-                        <col>
+                        <col oc-if-roles="AdminUserGroupAdmin">
                     </colgroup>
                     <thead>
                     <tr>
@@ -54,11 +56,8 @@
                             <i class="fa fa-caret-down" ng-show="adminUserGroups.parameters.sortBy == 'Name'"></i>
                             <i class="fa fa-caret-up" ng-show="adminUserGroups.parameters.sortBy == '!Name'"></i>
                         </th>
-                        <th colspan="2" ng-click="adminUserGroups.updateSort('Description')">
-                            Description
-                            <i class="fa fa-caret-down" ng-show="adminUserGroups.parameters.sortBy == 'Description'"></i>
-                            <i class="fa fa-caret-up" ng-show="adminUserGroups.parameters.sortBy == '!Description'"></i>
-                        </th>
+                        <th>Description</th>
+                        <th oc-if-roles="AdminUserGroupAdmin"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -68,25 +67,25 @@
                         </td>
                         <td><a href="" ui-sref="adminUserGroup({adminusergroupid:adminUserGroup.ID})">{{adminUserGroup.Name}}</a></td>
                         <td>{{adminUserGroup.Description}}</td>
-                        <td>
+                        <td oc-if-roles="AdminUserGroupAdmin">
                             <button class="btn btn-danger btn-xs" ng-click="adminUserGroups.deleteGroup(this)"><i class="fa fa-trash-o"></i> <span class="hidden-xs">Delete</span></button>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-            <uib-pagination class="pagination-sm pull-right"
-                            ng-if="application.$ocMedia('min-width:768px') && adminUserGroups.list.Meta.TotalPages > 1"
-                            total-items="adminUserGroups.list.Meta.TotalCount"
-                            items-per-page="adminUserGroups.list.Meta.PageSize"
-                            max-size="5"
-                            boundary-links="adminUserGroups.list.Meta.TotalPages > 5"
-                            ng-model="adminUserGroups.list.Meta.Page"
-                            ng-change="adminUserGroups.pageChanged()">
-            </uib-pagination>
+            <ul uib-pagination
+                class="pagination-sm pull-right hidden-xs"
+                ng-if="adminUserGroups.list.Meta.TotalPages > 1"
+                total-items="adminUserGroups.list.Meta.TotalCount"
+                items-per-page="adminUserGroups.list.Meta.PageSize"
+                max-size="5"
+                boundary-links="adminUserGroups.list.Meta.TotalPages > 5"
+                ng-model="adminUserGroups.list.Meta.Page"
+                ng-change="adminUserGroups.pageChanged()">
+            </ul>
             <button type="button"
-                    ng-if="application.$ocMedia('max-width:767px')"
-                    class="btn btn-default btn-block btn-lg"
+                    class="btn btn-default btn-block btn-lg visible-xs"
                     ng-show="adminUserGroups.list.Meta.Page < adminUserGroups.list.Meta.TotalPages"
                     ng-click="adminUserGroups.loadMore()">Load More</button>
         </div>

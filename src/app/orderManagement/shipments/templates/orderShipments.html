@@ -1,5 +1,5 @@
 <div ui-view cg-busy="application.stateLoading('shipments')">
-    <div ng-if="!orderShipments.list.Items.length" class="well text-center">
+    <div ng-if="!orderShipments.list.Items.length" class="no-matches">
         This order does not have any shipments. <br>
         <a ui-sref=".create">Create one now</a>
     </div>
@@ -17,17 +17,20 @@
                 </li>
             </ul>
             <!--====== SHIPMENT PAGINATION ======-->
-            <div class="text-center" ng-if="application.$ocMedia('min-width:768px') && orderShipments.list.Meta.TotalPages > 1">
-                <uib-pagination boundary-links="orderShipments.list.Meta.TotalPages > 5" max-size="5"
-                                total-items="orderShipments.list.Meta.TotalCount" items-per-page="orderShipments.list.Meta.PageSize"
-                                ng-model="orderShipments.list.Meta.Page" ng-change="orderShipments.pageChanged()"></uib-pagination>
-            </div>
+            <ul uib-pagination
+                class="pagination-sm pull-right hidden-xs"
+                ng-if="orderShipments.list.Meta.TotalPages > 1"
+                total-items="orderShipments.list.Meta.TotalCount"
+                items-per-page="orderShipments.list.Meta.PageSize"
+                max-size="5"
+                boundary-links="orderShipments.list.Meta.TotalPages > 5"
+                ng-model="orderShipments.list.Meta.Page"
+                ng-change="orderShipments.pageChanged()">
+            </ul>
             <button type="button"
-                    ng-if="application.$ocMedia('max-width:767px')"
-                    class="btn btn-default btn-block btn-lg"
+                    class="btn btn-default btn-block btn-lg visible-xs"
                     ng-show="orderShipments.list.Meta.Page < orderShipments.list.Meta.TotalPages"
-                    ng-click="orderShipments.loadMore()">Load More
-            </button>
+                    ng-click="orderShipments.loadMore()">Load More</button>
         </div>
         <div class="col-sm-7">
             <div ng-if="!orderShipments.selectedShipment" class="well text-center">
@@ -68,28 +71,30 @@
                     </div>
                     <br>
                     <div class="panel panel-default table-responsive">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered l-shipmentitem-table">
+                            <colgroup>
+                                <col>
+                                <col>
+                                <col>
+                                <col>
+                            </colgroup>
                             <thead>
                             <tr>
+                                <th><span class="hidden-xs">Quantity </span>Shipped</th>
                                 <th>Product</th>
                                 <th>Line Item ID</th>
-                                <th>Quantity Shipped</th>
-                                <th></th>
                                 <th></th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr ng-repeat-start="item in orderShipments.selectedShipment.Items" ng-if="item.OrderID == orderShipments.orderID">
+                                <td ng-click="orderShipments.editShipmentItem(item)">{{item.QuantityShipped + ' of ' + item.LineItem.Quantity}}</td>
                                 <td rowspan="{{orderShipments.selectedShipment.ShippingAddress ? 1 : 2}}">
                                     {{item.LineItem.Product.Name}} <small class="text-muted">({{item.LineItem.Product.ID}})</small>
                                 </td>
                                 <td>{{item.LineItem.ID}}</td>
-                                <td>{{item.QuantityShipped + ' of ' + item.LineItem.Quantity}}</td>
                                 <td class="actions-cell" rowspan="{{orderShipments.selectedShipment.ShippingAddress ? 1 : 2}}">
-                                    <button class="btn btn-default btn-xs btn-block" ng-click="orderShipments.editShipmentItem(item)">Edit</button>
-                                </td>
-                                <td class="actions-cell" rowspan="{{orderShipments.selectedShipment.ShippingAddress ? 1 : 2}}">
-                                    <button class="btn btn-danger btn-xs btn-block" ng-click="orderShipments.deleteShipmentItem(item)">Delete</button>
+                                    <button class="btn btn-danger btn-xs btn-block" ng-click="orderShipments.deleteShipmentItem(item)"><i class="fa fa-trash"></i> <span class="hidden-xs">Delete</span></button>
                                 </td>
                             </tr>
                             <tr ng-repeat-end ng-if="!orderShipments.selectedShipment.ShippingAddress">
@@ -99,7 +104,7 @@
                         </table>
                     </div>
                 </div>
-                <div ng-if="!orderShipments.selectedShipment.Items.length" class="well text-center">
+                <div ng-if="!orderShipments.selectedShipment.Items.length" class="no-matches">
                     This shipment does not have any items. <br>
                     <a ng-click="orderShipments.createShipmentItems()">Create one now</a>
                 </div>

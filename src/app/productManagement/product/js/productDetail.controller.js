@@ -2,7 +2,7 @@ angular.module('orderCloud')
     .controller('ProductDetailCtrl', ProductDetailController)
 ;
 
-function ProductDetailController($rootScope, $exceptionHandler, $state, toastr, OrderCloud, ocConfirm, SelectedProduct) {
+function ProductDetailController($rootScope, $state, toastr, OrderCloud, ocProducts, SelectedProduct) {
     var vm = this;
     vm.product = angular.copy(SelectedProduct);
     vm.productName = angular.copy(SelectedProduct.Name);
@@ -24,23 +24,15 @@ function ProductDetailController($rootScope, $exceptionHandler, $state, toastr, 
                 vm.inventoryEnabled = angular.copy(data.InventoryEnabled);
                 SelectedProduct = data;
                 vm.InfoForm.$setPristine();
-                toastr.success(data.Name + ' was updated', 'Success!');
+                toastr.success(data.Name + ' was updated');
             })
     }
 
     function deleteProduct(){
-        ocConfirm.Confirm({
-                message:'Are you sure you want to delete this product?'
-            })
-            .then(function(){
-                OrderCloud.Products.Delete(SelectedProduct.ID)
-                    .then(function() {
-                        toastr.success('Product Deleted', 'Success');
-                        $state.go('products', {}, {reload: true});
-                    })
-                    .catch(function(ex) {
-                        $exceptionHandler(ex)
-                    });
+        ocProducts.Delete(SelectedProduct)
+            .then(function() {
+                toastr.success(SelectedProduct.Name + ' was deleted.');
+                $state.go('products', {}, {reload: true});
             });
     }
 

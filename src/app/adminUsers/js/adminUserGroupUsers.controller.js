@@ -2,7 +2,7 @@ angular.module('orderCloud')
     .controller('AdminUserGroupUsersCtrl', AdminUserGroupUsersController)
 ;
 
-function AdminUserGroupUsersController($exceptionHandler, $filter, $state, $stateParams, toastr, ocAdminUsers, OrderCloud, ocParameters, UserList, CurrentAssignments, Parameters ) {
+function AdminUserGroupUsersController($exceptionHandler, $filter, $state, $stateParams, toastr, ocAdminUsers, OrderCloud, ocParameters, ocRolesService, UserList, CurrentAssignments, Parameters ) {
     var vm = this;
     vm.list = UserList;
     vm.parameters = Parameters;
@@ -21,6 +21,7 @@ function AdminUserGroupUsersController($exceptionHandler, $filter, $state, $stat
         $state.go('.', ocParameters.Create(vm.parameters, true), {notify:false}); //don't trigger $stateChangeStart/Success, this is just so the URL will update with the search
         vm.searchLoading = OrderCloud.AdminUsers.List(vm.parameters.search, 1, vm.parameters.pageSize, vm.parameters.searchOn, vm.parameters.sortBy, vm.parameters.filters)
             .then(function(data) {
+                vm.changedAssignments = [];
                 vm.list = ocAdminUsers.Assignments.Map(CurrentAssignments, data);
                 vm.searchResults = vm.parameters.search.length > 0;
 
@@ -59,8 +60,9 @@ function AdminUserGroupUsersController($exceptionHandler, $filter, $state, $stat
     vm.loadMore = function() {
         return OrderCloud.AdminUsers.List(Parameters.search, vm.list.Meta.Page + 1, Parameters.pageSize || vm.list.Meta.PageSize, Parameters.searchOn, Parameters.sortBy, Parameters.filters)
             .then(function(data) {
-                vm.list.Items = vm.list.Items.concat(data.Items);
-                vm.list.Meta = data.Meta;
+                var mappedData = ocAdminUsers.Assignments.Map(CurrentAssignments, data);
+                vm.list.Items = vm.list.Items.concat(mappedData.Items);
+                vm.list.Meta = mappedData.Meta;
 
                 selectedCheck();
             });
@@ -85,9 +87,9 @@ function AdminUserGroupUsersController($exceptionHandler, $filter, $state, $stat
 
     vm.selectItem = function(scope) {
         if (!scope.user.Assigned) vm.allItemsSelected = false;
-        vm.selectedCount = $filter('filter')(vm.list.Items, {'Assigned':true}).length;
 
         changedCheck();
+        selectedCheck();
     };
 
     vm.resetAssignments = function() {
@@ -113,29 +115,35 @@ function AdminUserGroupUsersController($exceptionHandler, $filter, $state, $stat
     vm.createUser = function() {
         ocAdminUsers.Create()
             .then(function(newAdminUser) {
-                var newAssignment = {
-                    UserID: newAdminUser.ID,
-                    UserGroupID: $stateParams.adminusergroupid
-                };
+                if (ocRolesService.UserIsAuthorized(['AdminUserGroupAdmin'])) {
+                    var newAssignment = {
+                        UserID: newAdminUser.ID,
+                        UserGroupID: $stateParams.adminusergroupid
+                    };
 
-                //Automatically assign the new user to this user group
-                vm.searchLoading = OrderCloud.AdminUserGroups.SaveUserAssignment(newAssignment)
-                    .then(function() {
-                        newAdminUser.Assigned = true;
-                        CurrentAssignments.push(newAssignment);
-                        _updateList(newAdminUser);
-                    })
-                    .catch(function() {
-                        newAdminUser.Assigned = false;
-                        _updateList(newAdminUser);
-                    });
+                    //Automatically assign the new user to this user group
+                    vm.searchLoading = OrderCloud.AdminUserGroups.SaveUserAssignment(newAssignment)
+                        .then(function() {
+                            newAdminUser.Assigned = true;
+                            CurrentAssignments.push(newAssignment);
+                            _updateList(newAdminUser);
+                        })
+                        .catch(function() {
+                            newAdminUser.Assigned = false;
+                            _updateList(newAdminUser);
+                        });
+                }
+                else {
+                    newAdminUser.Assigned = false;
+                    _updateList(newAdminUser);
+                }
             });
 
         function _updateList(n) {
             vm.list.Items.push(n);
             vm.list.Meta.TotalCount++;
             vm.list.Meta.ItemRange[1]++;
-            toastr.success(n.Username + ' was created.', 'Success!');
+            toastr.success(n.Username + ' was created.');
         }
     };
 
@@ -152,14 +160,14 @@ function AdminUserGroupUsersController($exceptionHandler, $filter, $state, $stat
 
                     changedCheck();
                 }
-                toastr.success(updatedAdminUser.Username + ' was updated.', 'Success!');
+                toastr.success(updatedAdminUser.Username + ' was updated.');
             })
     };
 
     vm.deleteUser = function(scope) {
         ocAdminUsers.Delete(scope.user)
             .then(function() {
-                toastr.success(scope.user.Username + ' was deleted.', 'Success!');
+                toastr.success(scope.user.Username + ' was deleted.');
                 vm.list.Items.splice(scope.$index, 1);
                 vm.list.Meta.TotalCount--;
                 vm.list.Meta.ItemRange[1]--;

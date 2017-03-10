@@ -2,9 +2,8 @@ angular.module('orderCloud')
     .controller('ProductShippingCtrl', ProductShippingController)
 ;
 
-function ProductShippingController(toastr, OrderCloud, AdminAddresses) {
+function ProductShippingController(toastr, OrderCloud, ocRolesService) {
     var vm = this;
-    vm.adminAddresses = AdminAddresses;
     vm.updateProductShipping = updateProductShipping;
     vm.listAllAdminAddresses = listAllAdminAddresses;
 
@@ -13,14 +12,16 @@ function ProductShippingController(toastr, OrderCloud, AdminAddresses) {
         vm.productUpdateLoading = OrderCloud.Products.Patch(product.ID, partial)
             .then(function() {
                 vm.ProductShippingForm.$setPristine();
-                toastr.success(product.Name + ' shipping was updated', 'Success!');
+                toastr.success(product.Name + ' shipping was updated');
             });
     }
 
     function listAllAdminAddresses(search){
-        return OrderCloud.AdminAddresses.List(search)
-            .then(function(data){
-                vm.adminAddresses = data;
-            });
+        if (ocRolesService.UserIsAuthorized(['AddressAdmin'])) {
+            return OrderCloud.AdminAddresses.List(search)
+                .then(function(data){
+                    vm.adminAddresses = data;
+                });
+        }
     }
 }

@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Four51/OrderCloud-Seed-AngularJS.git"
+    "url": "git+https://github.com/ordercloud-api/angular-admin.git"
   },
   "keywords": [
     "OrderCloud",
@@ -32,9 +32,9 @@
   "author": "Four51 Inc.",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Four51/OrderCloud-Seed-AngularJS/issues"
+    "url": "https://github.com/ordercloud-api/angular-admin/issues"
   },
-  "homepage": "https://github.com/Four51/OrderCloud-Seed-AngularJS#readme",
+  "homepage": "https://github.com/ordercloud-api/angular-admin",
   "dependencies": {
     "browser-sync": "2.11.1",
     "del": "2.2.0",
@@ -47,6 +47,7 @@
     "gulp-beautify": "2.0.0",
     "gulp-cached": "1.1.0",
     "gulp-concat": "2.6.0",
+    "gulp-concat-css": "2.3.0",
     "gulp-csso": "1.0.1",
     "gulp-filter": "3.0.1",
     "gulp-flatten": "0.2.0",

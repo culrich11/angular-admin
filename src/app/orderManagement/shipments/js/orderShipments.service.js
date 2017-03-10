@@ -2,14 +2,16 @@ angular.module('orderCloud')
     .factory('ocOrderShipmentsService', OrderCloudOrderShipmentsService)
 ;
 
-function OrderCloudOrderShipmentsService($q, $uibModal, OrderCloud) {
+function OrderCloudOrderShipmentsService($q, $uibModal, ocConfirm, OrderCloud) {
     var service = {
         List: _list,
         ListLineItems: _listLineItems,
         Create: _create,
         Edit: _edit,
+        Delete: _delete,
         CreateItems: _createItems,
-        EditItem: _editItem
+        EditItem: _editItem,
+        DeleteItem: _deleteItem
     };
 
     function _list(orderID, buyerID, page, pageSize) {
@@ -108,6 +110,16 @@ function OrderCloudOrderShipmentsService($q, $uibModal, OrderCloud) {
         }).result
     }
 
+    function _delete(shipmentID, buyerID) {
+        return ocConfirm.Confirm({
+                message:'Are you sure you want to delete <br> <b>' + shipmentID + '</b>?',
+                confirmText: 'Delete shipment',
+                type: 'delete'})
+            .then(function() {
+                return OrderCloud.Shipments.Delete(shipmentID, buyerID);
+            });
+    }
+
     function _createItems(shipment, orderID, buyerID) {
         return $uibModal.open({
             templateUrl: 'orderManagement/shipments/templates/orderShipmentsCreateItem.modal.html',
@@ -148,6 +160,15 @@ function OrderCloudOrderShipmentsService($q, $uibModal, OrderCloud) {
                 }
             }
         }).result
+    }
+
+    function _deleteItem(shipmentID, orderID, lineItemID, buyerID) {
+        return ocConfirm.Confirm({
+            message:'Are you sure you want to delete this shipment item? <br>' + lineItemID,
+            confirmText: 'Delete shipment item'})
+            .then(function() {
+                return OrderCloud.Shipments.DeleteItem(shipmentID, orderID, lineItemID, buyerID);
+            });
     }
 
     return service;
