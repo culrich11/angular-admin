@@ -1,11 +1,11 @@
 {
-  "appname": "Angular Admin",
+  "appname": "Promo Admin",
   "scope": "ProductAdmin ProductReader InventoryAdmin ProductAssignmentAdmin BuyerAdmin BuyerReader CategoryAdmin CategoryReader AddressAdmin AddressReader CostCenterAdmin CostCenterReader PromotionAdmin PromotionReader CreditCardAdmin CreditCardReader OrderAdmin OrderReader UnsubmittedOrderReader PriceScheduleAdmin PriceScheduleReader SpendingAccountAdmin SpendingAccountReader BuyerUserAdmin BuyerUserReader UserGroupAdmin UserGroupReader ApprovalRuleAdmin ApprovalRuleReader PermissionAdmin AdminUserAdmin AdminUserReader AdminUserGroupAdmin AdminUserGroupReader MessageConfigAssignmentAdmin CatalogReader CatalogAdmin MeAdmin MeXpAdmin MeAddressAdmin MeCreditCardAdmin OverrideUnitPrice OverrideShipping OverrideTax",
-  "clientid": "D89E2196-CC75-4312-A4A9-67E4CC4BEDFB",
-  "buyerid": "A",
+  "clientid": "8E58C9D4-7EE1-450E-AC33-D3C275F2DE8E",
+  "buyerid": "12353234",
   "catalogid": "SHARED",
   "environment": "prod",
   "defaultstate": "home",
   "html5mode": false,
-  "bootswatchtheme": null
+  "bootswatchtheme": "lumen"
 }
