@@ -2,7 +2,7 @@ angular.module('orderCloud')
     .controller('SpendingAccountsCtrl', SpendingAccountsController)
 ;
 
-function SpendingAccountsController($exceptionHandler, $state, $stateParams, toastr, OrderCloud, ocParameters, ocSpendingAccounts, CurrentAssignments, SpendingAccountList, Parameters) {
+function SpendingAccountsController($exceptionHandler, $state, $stateParams, toastr, OrderCloudSDK, ocParameters, ocSpendingAccounts, CurrentAssignments, SpendingAccountList, Parameters) {
     var vm = this;
     vm.list = SpendingAccountList;
     vm.parameters = Parameters;
@@ -19,15 +19,7 @@ function SpendingAccountsController($exceptionHandler, $state, $stateParams, toa
 
     //Reload the state with new search parameter & reset the page
     vm.search = function() {
-        $state.go('.', ocParameters.Create(vm.parameters, true), {notify:false}); //don't trigger $stateChangeStart/Success, this is just so the URL will update with the search
-        vm.searchLoading = OrderCloud.SpendingAccounts.List(vm.parameters.search, 1, vm.parameters.pageSize, vm.parameters.searchOn, vm.parameters.sortBy, vm.parameters.filters, vm.parameters.buyerid)
-            .then(function(data) {
-                vm.changedAssignments = [];
-                vm.list = ocSpendingAccounts.Assignments.Map(CurrentAssignments, data);
-                vm.searchResults = vm.parameters.search.length > 0;
-
-                selectedCheck();
-            })
+        vm.filter(true);
     };
 
     //Clear the search parameter, reload the state & reset the page
@@ -59,7 +51,8 @@ function SpendingAccountsController($exceptionHandler, $state, $stateParams, toa
 
     //Load the next page of results with all of the same parameters
     vm.loadMore = function() {
-        return OrderCloud.SpendingAccounts.List(Parameters.search, vm.list.Meta.Page + 1, Parameters.pageSize || vm.list.Meta.PageSize, Parameters.searchOn, Parameters.sortBy, Parameters.filters, Parameters.buyerid)
+        var parameters = angular.extend(Parameters, {page:vm.list.Meta.Page + 1});
+        return OrderCloudSDK.SpendingAccounts.List($stateParams.buyerid, parameters)
             .then(function(data) {
                 var mappedData = ocSpendingAccounts.Assignments.Map(CurrentAssignments, data);
                 vm.list.Items = vm.list.Items.concat(mappedData.Items);
@@ -81,7 +74,7 @@ function SpendingAccountsController($exceptionHandler, $state, $stateParams, toa
 
     vm.selectAllItems = function() {
         vm.allItemsSelected = !vm.allItemsSelected;
-        _.map(vm.list.Items, function(i) { i.Assigned = vm.allItemsSelected });
+        _.map(vm.list.Items, function(i) { i.Assigned = vm.allItemsSelected; });
 
         changedCheck();
     };
@@ -112,7 +105,7 @@ function SpendingAccountsController($exceptionHandler, $state, $stateParams, toa
                 selectedCheck();
 
                 toastr.success('Spending account assignments updated.');
-            })
+            });
     };
 
     vm.createSpendingAccount = function() {
@@ -125,7 +118,7 @@ function SpendingAccountsController($exceptionHandler, $state, $stateParams, toa
                     };
 
                     //Automatically assign the new user to this user group
-                    vm.searchLoading = OrderCloud.SpendingAccounts.SaveAssignment(newAssignment, $stateParams.buyerid)
+                    vm.searchLoading = OrderCloudSDK.SpendingAccounts.SaveAssignment($stateParams.buyerid, newAssignment)
                         .then(function() {
                             newSpendingAccount.Assigned = true;
                             CurrentAssignments.push(newAssignment);
@@ -163,7 +156,7 @@ function SpendingAccountsController($exceptionHandler, $state, $stateParams, toa
                     changedCheck();
                 }
                 toastr.success(updatedSpendingAccount.Name + ' was updated.');
-            })
+            });
     };
 
     vm.deleteSpendingAccount = function(scope) {
@@ -175,6 +168,6 @@ function SpendingAccountsController($exceptionHandler, $state, $stateParams, toa
                 vm.list.Meta.ItemRange[1]--;
 
                 changedCheck();
-            })
+            });
     };
 }
